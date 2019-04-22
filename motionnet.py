@@ -117,17 +117,8 @@ class UNet(torch.nn.Module):
         out = self.up_block3(x1, out)
         out = torch.nn.functional.relu(self.last_bn(self.last_conv1(out)))
         out = self.last_conv2(out)
-        # change the output
-        out = (out + x)
-        # out = torch.sigmoid(out) #Try tanh and scale
-        # out = torch.nn.functional.relu(self.last_bn2(self.last_conv2(out)))
-        # out = torch.nn.functional.relu(self.last_conv2(out))
-        # out = self.linear1(out.reshape(self.opts.batch_size, -1))
-        # out = self.linear2(out).reshape(self.opts.batch_size, 1, 64, 520)
-        # out = torch.nn.functional.sigmoid(out)
-        # out = self.softplus(out)
-        out = torch.sigmoid(out)
-        print(out.shape)
+
+        out = torch.nn.functional.relu(out)
         return out
 
 

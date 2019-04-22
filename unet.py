@@ -158,7 +158,7 @@ class Sino_repair_net():
         #             torch.rsqrt(torch.sum(vx ** 2)) * torch.rsqrt(torch.sum(vy ** 2)))  # use Pearson correlation
 
 
-        loss = loss1 + loss2 #+ loss3
+        loss = loss1 #+ loss2 #+ loss3
         # print(loss1, loss2, loss3)
 
         self.optimizer.zero_grad()
