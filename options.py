@@ -36,7 +36,7 @@ def parse():
                         help='Batch size in the forward pass of the network')
     parser.add_argument('--test-batch-size', type=int, dest='test_batch_size', default=12,
                         help='Test batch size in the forward pass of the network')
-    parser.add_argument('--initial-lr', type=float, dest='initial_lr', default=0.0001,
+    parser.add_argument('--initial-lr', type=float, dest='initial_lr', default=0.001,
                         help='Initial learning rate parameter (adjustments are adaptive)')
     parser.add_argument('--lr-decay-factor', type=int, dest='lr_decay', default=0.985,
                         help='Factor to reduce the learning rate by at each optimizer step')

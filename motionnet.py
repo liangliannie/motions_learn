@@ -66,30 +66,31 @@ class UNet(torch.nn.Module):
         # kernel_size = opts.kernel_size # we could change this later
         kernel_size = 3
         # Encoder network
-        self.down_block1 = UNet_down_block(input_channel_number, 2, False) # 64*520
-        self.down_block2 = UNet_down_block(2, 4, True) # 64*520
-        self.down_block3 = UNet_down_block(4, 4, True) # 64*260
+        basic = 2
+        self.down_block1 = UNet_down_block(input_channel_number, basic, False) # 64*520
+        self.down_block2 = UNet_down_block(basic, basic*2, True) # 64*520
+        self.down_block3 = UNet_down_block(basic*2, basic*2, True) # 64*260
 
 
         # bottom convolution
-        self.mid_conv1 = torch.nn.Conv3d(4, 4, kernel_size, padding=(1, 1, 1), bias=False)# 64*260
-        self.bn1 = torch.nn.BatchNorm3d(4)
-        self.mid_conv2 = torch.nn.Conv3d(4, 4, kernel_size, padding=(1, 1, 1), bias=False)# 64*260
-        self.bn2 = torch.nn.BatchNorm3d(4)
-        self.mid_conv3 = torch.nn.Conv3d(4, 4, kernel_size, padding=(1, 1, 1), bias=False) #, dilation=4 # 64*260
-        self.bn3 = torch.nn.BatchNorm3d(4)
-        self.mid_conv4 = torch.nn.Conv3d(4, 4, kernel_size, padding=(1, 1, 1), bias=False)# 64*260
-        self.bn4 = torch.nn.BatchNorm3d(4)
-        self.mid_conv5 = torch.nn.Conv3d(4,4, kernel_size, padding=(1, 1, 1), bias=False)# 64*260
-        self.bn5 = torch.nn.BatchNorm3d(4)
+        self.mid_conv1 = torch.nn.Conv3d(basic*2, basic*2, kernel_size, padding=(1, 1, 1), bias=False)# 64*260
+        self.bn1 = torch.nn.BatchNorm3d(basic*2)
+        self.mid_conv2 = torch.nn.Conv3d(basic*2, basic*2, kernel_size, padding=(1, 1, 1), bias=False)# 64*260
+        self.bn2 = torch.nn.BatchNorm3d(basic*2)
+        self.mid_conv3 = torch.nn.Conv3d(basic*2, basic*2, kernel_size, padding=(1, 1, 1), bias=False) #, dilation=4 # 64*260
+        self.bn3 = torch.nn.BatchNorm3d(basic*2)
+        self.mid_conv4 = torch.nn.Conv3d(basic*2, basic*2, kernel_size, padding=(1, 1, 1), bias=False)# 64*260
+        self.bn4 = torch.nn.BatchNorm3d(basic*2)
+        self.mid_conv5 = torch.nn.Conv3d(basic*2,basic*2, kernel_size, padding=(1, 1, 1), bias=False)# 64*260
+        self.bn5 = torch.nn.BatchNorm3d(basic*2)
 
         # Decoder network
-        self.up_block2 = UNet_up_block(4, 4, 4, 1)# 64*520
-        self.up_block3 = UNet_up_block(2, 4, 2, 1)# 64*520
+        self.up_block2 = UNet_up_block(basic*2, basic*2, basic*2, 1)# 64*520
+        self.up_block3 = UNet_up_block(basic, basic*2, basic, 1)# 64*520
         # Final output
-        self.last_conv1 = torch.nn.Conv3d(2, 2, 3, padding=(1, 1, 1), bias=False)# 64*520
-        self.last_bn = torch.nn.BatchNorm3d(2) # 64*520
-        self.last_conv2 = torch.nn.Conv3d(2, 1, 3, padding=(1, 1, 1))# 64*520
+        self.last_conv1 = torch.nn.Conv3d(basic, basic, 3, padding=(1, 1, 1), bias=False)# 64*520
+        self.last_bn = torch.nn.BatchNorm3d(basic) # 64*520
+        self.last_conv2 = torch.nn.Conv3d(basic, 1, 3, padding=(1, 1, 1))# 64*520
         # self.linear1 = torch.nn.Sequential(*self.lin_tan_drop(64*520, 1024))
         # self.linear2 = torch.nn.Sequential(*self.lin_tan_drop(1024, 64*520))
         self.softplus = torch.nn.Softplus(beta=5, threshold=100)
@@ -117,8 +118,9 @@ class UNet(torch.nn.Module):
         out = self.up_block3(x1, out)
         out = torch.nn.functional.relu(self.last_bn(self.last_conv1(out)))
         out = self.last_conv2(out)
-
-        out = torch.nn.functional.relu(out)
+        # out = torch.nn.functional.relu(out)
+        #out = torch.sigmoid(out)
+        out = self.softplus(out)
         return out
 
 

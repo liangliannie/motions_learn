@@ -35,15 +35,18 @@ def preprocess(input_img, target_img, train=False):
 
     Scale_Means = []
     for idx in range(len(input_img)):
-        # shape = input_img[idx].shape
-        # scaler = StandardScaler(with_mean=False)
-        # data = input_img[idx][0].cpu().numpy()
-        # scaler.fit(data)
-        # input_img[idx] = torch.tensor(data).reshape(shape).cuda()
-        mean_input = input_img[idx].mean()
-        max_input = input_img[idx].std()+1e-8
-        input_img[idx] = (input_img[idx] - mean_input) / max_input
+        # mean_input = input_img[idx].mean()
+        # max_input = input_img[idx].std()+1e-8
+        # input_img[idx] = (input_img[idx] - mean_input) / max_input
+        # Scale_Means.append((mean_input, max_input))
+
+        mean_input = 0
+        max_input = input_img[idx].max()+1e-8
+        input_img[idx] = input_img[idx]/max_input
+        target_img[idx] = target_img[idx]/max_input
+
         Scale_Means.append((mean_input, max_input))
+
     return Scale_Means, input_img, target_img
 
 

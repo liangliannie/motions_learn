@@ -84,12 +84,16 @@ class Sino_Dataset(Dataset):
 
     def __getitem__(self, idx):
 
+        if self.is_test and self.trainfile_init>=1:
+            raise StopIteration
         self.loadFile(self.trainfile[self.trainfile_init])
         self.trainfile_init += 1
-        self.trainfile_init %= len(self.trainfile)
         orig_sino, corrupt_sino = np.pad(self.data[0], ((1, 0), (0, 0),  (0, 0)), 'edge'), np.pad(self.data[1], ((1, 0), (0, 0),(0, 0)), 'edge')
         orig_sino = np.expand_dims(orig_sino, axis=0)
         corrupt_sino = np.expand_dims(corrupt_sino, axis=0)
+        if not self.is_test:
+            self.trainfile_init %= len(self.trainfile)
+
         # if self.init and self.DataQueryCount >= (self.datalen - self.input_depth + 1):
         #
         #
